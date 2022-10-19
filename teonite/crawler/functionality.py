@@ -1,3 +1,6 @@
+import string
+import itertools
+
 from bs4 import BeautifulSoup
 from requests import get, Response
 from crawler.models import Article
@@ -38,3 +41,36 @@ class Scrapper:
                     title=elem.get("title"),
                     content=elem.get("content"),
                 )
+
+    @staticmethod
+    def return_words_dict(sentence):
+        sentence = sentence
+        for sign in string.punctuation:
+            sentence = sentence.replace(sign, " ")
+        words = dict()
+        for word in sentence.lower().strip().split(" "):
+            if word in words.keys():
+                words[word] += 1
+            else:
+                words[word] = 1
+
+        return words
+
+    @staticmethod
+    def calculate_10_most_common_words():
+        articles = Article.objects.all()
+        sentence = ""
+        for article in articles:
+            sentence = sentence + article.content
+
+        dictionary = Scrapper.return_words_dict(sentence)
+        sorted_dictionary = itertools.islice(
+            {
+                k: v
+                for k, v in sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
+            }.items(),
+            1,
+            11,
+        )
+
+        return dict(sorted_dictionary)
