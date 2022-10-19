@@ -1,5 +1,8 @@
 import string
 import itertools
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import nltk
 
 from bs4 import BeautifulSoup
 from requests import get, Response
@@ -43,10 +46,21 @@ class Scrapper:
                 )
 
     @staticmethod
+    def remove_stop_words(sentence):
+        stop_words = set(stopwords.words("english"))
+        word_tokens = word_tokenize(sentence)
+        filtered_sentence = []
+        for w in word_tokens:
+            if w not in stop_words:
+                filtered_sentence.append(w)
+
+        return " ".join(filtered_sentence)
+
+    @staticmethod
     def return_words_dict(sentence):
-        sentence = sentence
+        sentence = Scrapper.remove_stop_words(sentence)
         for sign in string.punctuation:
-            sentence = sentence.replace(sign, " ")
+            sentence = sentence.replace(sign, "")
         words = dict()
         for word in sentence.lower().strip().split(" "):
             if word in words.keys():
@@ -69,8 +83,8 @@ class Scrapper:
                 k: v
                 for k, v in sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
             }.items(),
-            1,
-            11,
+            0,
+            10,
         )
 
         return dict(sorted_dictionary)
