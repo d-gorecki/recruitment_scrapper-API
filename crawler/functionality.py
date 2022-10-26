@@ -1,8 +1,13 @@
 import string
 import itertools
+
+from django.db.models import QuerySet
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import nltk
+
+nltk.download("stopwords")
+nltk.download("punkt")
 
 from bs4 import BeautifulSoup, PageElement
 from requests import get, Response
@@ -21,7 +26,7 @@ class Scrapper:
         """Gets data from URL with the use of BeautifulSoup methods and returns processed data in form of list of
         dictionaries consisting of author, ttle and content"""
         article_data = []
-        for article in Scrapper.bs.find("div", class_="post-cards").find_all("article"):
+        for article in self.bs.find("div", class_="post-cards").find_all("article"):
             title_anchor: PageElement = article.find("a", class_="title", href=True)
             title: str = title_anchor.get_text()
             article_detail: Response = get("https://teonite.com" + title_anchor["href"])
@@ -41,7 +46,7 @@ class Scrapper:
     def populate_article_table(self, arr: list) -> None:
         """Save passed data ino Article table of database"""
         for elem in arr:
-            db_article: Article = Article.objects.filter(
+            db_article: QuerySet[Article] = Article.objects.filter(
                 author=elem.get("author"), title=elem.get("title")
             )
             if not db_article:  # Checks if DB has not been populated previously
@@ -54,7 +59,7 @@ class Scrapper:
     def populate_author_table(self, top_words_dict: dict[str, int]):
         """Save passed data ino Author table of database"""
         for full_name, top_used_words in top_words_dict.items():
-            author: Author = Author.objects.filter(
+            author: QuerySet[Author] = Author.objects.filter(
                 full_name=full_name
             )  # Checks if DB has not been populated previously
             if not author:
