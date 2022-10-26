@@ -6,7 +6,8 @@ import nltk
 
 from bs4 import BeautifulSoup
 from requests import get, Response
-from crawler.models import Article
+from crawler.models import Article, Author
+from collections import OrderedDict
 
 
 class Scrapper:
@@ -14,8 +15,7 @@ class Scrapper:
     article_list: Response = get(URL)
     bs = BeautifulSoup(article_list.content, features="html.parser")
 
-    @staticmethod
-    def get_content():
+    def get_content(self):
         article_data = []
         for article in Scrapper.bs.find("div", class_="post-cards").find_all("article"):
             title_anchor = article.find("a", class_="title", href=True)
@@ -32,21 +32,31 @@ class Scrapper:
 
         return article_data
 
-    @staticmethod
-    def populate_database(arr):
+    def populate_article_table(self, arr):
         for elem in arr:
             db_article = Article.objects.filter(
                 author=elem.get("author"), title=elem.get("title")
             )
-            if not db_article:
+            if not db_article:  # Checks if DB has not been populated previously
                 Article.objects.create(
                     author=elem.get("author"),
                     title=elem.get("title"),
                     content=elem.get("content"),
                 )
 
-    @staticmethod
-    def remove_stop_words(sentence):
+    def populate_author_table(self, top_words_dict):
+        for full_name, top_used_words in top_words_dict.items():
+            author = Author.objects.filter(
+                full_name=full_name
+            )  # Checks if DB has not been populated previously
+            if not author:
+                Author.objects.create(
+                    full_name=full_name,
+                    author_uri="".join(full_name.strip().lower().split(" ")),
+                    top_used_words=top_used_words,
+                )
+
+    def remove_stop_words(self, sentence):
         stop_words = set(stopwords.words("english"))
         word_tokens = word_tokenize(sentence)
         filtered_sentence = []
@@ -56,13 +66,13 @@ class Scrapper:
 
         return " ".join(filtered_sentence)
 
-    @staticmethod
-    def return_words_dict(sentence):
-        sentence = Scrapper.remove_stop_words(sentence)
-        for sign in string.punctuation:
+    def return_words_dict(self, sentence):
+        sentence = self.remove_stop_words(sentence)
+        for sign in string.punctuation + "’“”—":
             sentence = sentence.replace(sign, "")
         words = dict()
-        for word in sentence.lower().strip().split(" "):
+        sentence = sentence.lower().strip().split(" ")
+        for word in list(filter(None, sentence)):
             if word in words.keys():
                 words[word] += 1
             else:
@@ -70,21 +80,21 @@ class Scrapper:
 
         return words
 
-    @staticmethod
-    def calculate_10_most_common_words():
-        articles = Article.objects.all()
+    def calculate_10_most_common_words(self, author):
+        if author == "total":
+            articles = Article.objects.all()
+        else:
+            articles = Article.objects.filter(author=author)
         sentence = ""
         for article in articles:
             sentence = sentence + article.content
 
-        dictionary = Scrapper.return_words_dict(sentence)
+        dictionary = self.return_words_dict(sentence)
         sorted_dictionary = itertools.islice(
             {
                 k: v
                 for k, v in sorted(dictionary.items(), key=lambda x: x[1], reverse=True)
             }.items(),
-            0,
             10,
         )
-
         return dict(sorted_dictionary)
