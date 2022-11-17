@@ -11,7 +11,8 @@ nltk.download("punkt")
 
 from bs4 import BeautifulSoup, PageElement
 from requests import get, Response
-from crawler.models import Article, Author
+from crawler.models.article import Article
+from crawler.models.author import Author
 
 
 class Scrapper:
