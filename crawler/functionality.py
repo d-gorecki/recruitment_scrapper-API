@@ -82,12 +82,13 @@ class Scrapper:
         return " ".join(filtered_sentence)
 
     def return_words_dict(self, sentence: str) -> dict[str, int]:
-        """Returns dictionary in form of word: occurrence_number"""
-        sentence: str = self.remove_stop_words(sentence)
+        """Returns dictionary in form of word: quantity"""
         for sign in string.punctuation + "’“”—":
             sentence = sentence.replace(sign, "")
+        sentence: str = sentence.lower().strip()
+        sentence = self.remove_stop_words(sentence)
+        sentence: list = sentence.split(" ")
         words = dict()
-        sentence = sentence.lower().strip().split(" ")
         for word in list(filter(None, sentence)):
             if word in words.keys():
                 words[word] += 1
@@ -97,6 +98,7 @@ class Scrapper:
         return words
 
     def calculate_10_most_common_words(self, author: str) -> dict[str, int]:
+        """Returns dict of 10 most common words in form of word: quantity"""
         if author == "total":
             articles = Article.objects.all()
         else:
