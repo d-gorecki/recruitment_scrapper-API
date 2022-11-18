@@ -1,16 +1,17 @@
-import string
 import itertools
+import string
 
+import nltk
 from django.db.models import QuerySet
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-import nltk
 
 nltk.download("stopwords")
 nltk.download("punkt")
 
 from bs4 import BeautifulSoup, PageElement
-from requests import get, Response
+from requests import Response, get
+
 from crawler.models.article import Article
 from crawler.models.author import Author
 

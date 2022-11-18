@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from crawler.functionality import Scrapper
 from crawler.models.article import Article
 

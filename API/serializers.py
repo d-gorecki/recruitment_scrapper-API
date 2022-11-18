@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from crawler.models.article import Article
 from crawler.models.author import Author
 

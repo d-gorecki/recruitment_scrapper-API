@@ -1,5 +1,4 @@
 from django.db.models import QuerySet
-
 from rest_framework import generics
 
 from API.serializers.article_serializer import ArticlesSerializer

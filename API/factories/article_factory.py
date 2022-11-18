@@ -1,5 +1,6 @@
 import factory
 from factory.faker import faker
+
 from crawler.models.article import Article
 
 fake = faker.Faker()

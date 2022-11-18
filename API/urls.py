@@ -1,7 +1,8 @@
-from django.urls import path, include
-from API.views.authors import AuthorsSlugListView, AuthorStatsView, TotalStatsListView
-from API.views.articles import ArticlesListView
+from django.urls import include, path
 
+from API.views.articles import ArticlesListView
+from API.views.authors import (AuthorsSlugListView, AuthorStatsView,
+                               TotalStatsListView)
 
 urlpatterns = [
     path("articles/", ArticlesListView.as_view(), name="articles"),

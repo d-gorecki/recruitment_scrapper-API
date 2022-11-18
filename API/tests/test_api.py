@@ -1,8 +1,9 @@
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
+
 from API.factories.article_factory import ArticleFactory
 from API.factories.author_factory import AuthorFactory
-from rest_framework import status
 
 
 class TestAPI(APITestCase):
