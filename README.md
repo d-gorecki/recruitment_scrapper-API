@@ -1,7 +1,7 @@
 
 
 # Implementation of recruitment task for the position of backend dev.
-### _Tech-stack: Python, Django, Django REST framework, BS4, Docker, docker-compose_ 
+### _Tech-stack: Python, Django, Django REST framework, BS4, Docker, docker-compose_
 
 ## Task objective
 
